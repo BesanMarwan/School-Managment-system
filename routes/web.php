@@ -22,7 +22,7 @@ Route::get('/', function () {
 Route::group(
     [
         'prefix' => LaravelLocalization::setLocale(),
-        'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ,'auth']
+        /*'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ,'auth']*/
     ], function(){
     /** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
 
@@ -34,9 +34,3 @@ Route::group(
 });
 
 
-
-
-
-Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');

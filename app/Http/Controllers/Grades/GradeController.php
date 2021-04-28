@@ -1,8 +1,12 @@
 <?php 
 
-namespace App\Http\Controllers\Grade;
+namespace App\Http\Controllers\Grades;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Models\Grade;
+use App\Http\Requests\GradeRequest;
+
 
 class GradeController extends Controller 
 {
@@ -14,7 +18,8 @@ class GradeController extends Controller
    */
   public function index()
   {
-    
+    $Grades = Grade::all();
+    return view('pages.Grades.index',compact('Grades'));
   }
 
   /**
@@ -32,8 +37,26 @@ class GradeController extends Controller
    *
    * @return Response
    */
-  public function store(Request $request)
+  public function store(GradeRequest $request)
   {
+    try{
+    $grade =Grade::create([
+      'Name'  => [
+         'en' => $request->Name_en,
+         'ar' => $request->Name,
+      ],
+      'Notes' => $request->Notes,
+   ]);
+  if(!$grade){
+    toastr()->error(__('message.Failure'));
+    return redirect()->route('Grades.index');
+   }
+   toastr()->success(__('message.success'));
+   return redirect()->route('Grades.index');
+    }catch(\Exception $e){
+      return redirect()->back()->with(['error'=>$e->getMessage()]);
+    }
+
     
   }
 
@@ -65,8 +88,27 @@ class GradeController extends Controller
    * @param  int  $id
    * @return Response
    */
-  public function update($id)
+  public function update(GradeRequest $request,$id)
   {
+    try{
+      $grades = Grade::FindOrFail($request->id);
+      if(! $grades){
+        toastr()->danger(__('message.NotFound'));
+        return redirect()->route('Grades.index');
+       }
+       $grades->update([
+        'Name'  => [
+           'en' => $request->Name_en,
+           'ar' => $request->Name,
+        ],
+        'Notes' => $request->Notes,
+     ]);
+       toastr()->success(__('message.update'));
+       return redirect()->route('Grades.index');
+        }catch(\Exception $e){
+          return redirect()->back()->with(['error'=>$e->getMessage()]);
+        }
+    
     
   }
 
@@ -76,11 +118,15 @@ class GradeController extends Controller
    * @param  int  $id
    * @return Response
    */
-  public function destroy($id)
+  public function destroy(Request $request,$id)
   {
+    $grades = Grade::FindOrFail($request->id)->delete();
+     toastr()->error(__('message.delete'));
+       return redirect()->route('Grades.index');
     
   }
   
 }
 
 ?>
+  
